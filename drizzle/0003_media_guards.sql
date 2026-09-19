@@ -1,0 +1,3 @@
+CREATE TRIGGER media_post_binding BEFORE UPDATE OF post_id ON media WHEN OLD.post_id IS NOT NULL AND NEW.post_id<>OLD.post_id BEGIN
+ SELECT RAISE(ABORT,'UPLOAD_FAILED');
+END;
