@@ -66,3 +66,63 @@ git push -u origin main
 需要让网站上线时，按照 `docs/本地运行与部署.md` 确定托管和数据库方案。该论坛有真实后台，不能只作为静态网页上传到 GitHub Pages 来运行全部功能。
 
 如果决定换成 Supabase，需要改造数据库相关代码并重新验收；本交付包没有假装已经完成这一步。
+
+## 先让自己能进入后台：最短路径
+
+要进入论坛并看里面的内容，首先得创建第一个管理员账号。代码里要求先设置两个环境变量：
+
+- `ADMIN_SETUP_TOKEN`
+- `ADMIN_EMAIL`
+
+参考 [.env.example](.env.example) 里的内容。可以直接在项目根目录生成一个 `.env` 文件，内容示例：
+
+```bash
+ADMIN_SETUP_TOKEN=replace-with-random-token
+ADMIN_EMAIL=admin@example.invalid
+```
+
+生成一个随机 token 的最简单方式：
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+或者：
+
+```bash
+openssl rand -hex 32
+```
+
+把它填进 `ADMIN_SETUP_TOKEN`。然后启动本地项目：
+
+```bash
+pnpm install
+pnpm dev
+```
+
+访问：
+
+```text
+http://localhost:3000/setup#key=YOUR_TOKEN
+```
+
+在这里填写用户名、邮箱、密码，即可创建首个管理员账号。后台代码会检查：
+
+- token 是否匹配
+- email 是否匹配
+- 是否尚未初始化过管理员
+
+如果这些都成立，就会创建管理员账户并允许你进 `/admin` 和论坛内容区。
+
+## 当前离“真正能用的 app”还差什么
+
+| 项目 | 状态 | 说明 |
+| --- | --- | --- |
+| 管理员首次初始化 | 还需要手动设置 | 必须先生成 `ADMIN_SETUP_TOKEN` 和 `ADMIN_EMAIL`，再访问 `/setup#key=...` |
+| 本地 D1 表结构 | 还需要初始化 | 需要按顺序执行 Drizzle SQL 迁移，创建 `users`、`quiz_questions` 等表 |
+| 本地环境绑定 | 还需要配置 | 需要 `.env`、`.dev.vars` 和 `.openai/hosting.json` 绑定 D1/R2 |
+| 路由与别名 | 已修复 | 入口文件和 `@/` 别名已对齐，避免 500 和模块找不到 |
+| 业务功能 | 基本已实现 | 论坛、登录、发帖、评论、积分、管理后台等逻辑已写好 |
+| 生产部署 | 还未完成 | 还缺真实部署、线上环境变量、域名和云端数据库配置 |
+
+一句话总结：代码层面已经很接近“可运行的论坛”，但还没有完成“在新环境里可直接启动并上线”的最后一层准备。

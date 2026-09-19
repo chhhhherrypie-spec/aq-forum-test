@@ -1,5 +1,6 @@
 import { sites } from '@openai/sites-vite-plugin';
 import tailwindcss from '@tailwindcss/postcss';
+import path from 'node:path';
 import vinext from 'vinext';
 import { defineConfig } from 'vite';
 import hostingConfig from './.openai/hosting.json';
@@ -46,6 +47,28 @@ export default defineConfig(async () => {
 
   return {
     css: { postcss: { plugins: [tailwindcss()] } },
+    resolve: {
+      alias: [
+        {
+          find: /^@\/components\/ui\/(.*)$/,
+          replacement: (_: string, p1: string) =>
+            path.resolve(__dirname, p1.replace(/^components\/ui\//, '')),
+        },
+        {
+          find: /^@\/components\/forum\/(.*)$/,
+          replacement: (_: string, p1: string) =>
+            path.resolve(__dirname, p1.replace(/^components\/forum\//, '')),
+        },
+        {
+          find: /^@\/app$/,
+          replacement: path.resolve(__dirname, 'app.tsx'),
+        },
+        {
+          find: /^@\/(.*)$/,
+          replacement: (_: string, p1: string) => path.resolve(__dirname, p1),
+        },
+      ],
+    },
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : undefined,
