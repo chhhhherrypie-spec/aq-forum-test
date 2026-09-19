@@ -1,0 +1,1 @@
+{"name":"aq-forum-local","main":"vinext/server/fetch-handler","compatibility_date":"2026-05-15","compatibility_flags":["nodejs_compat"],"d1_databases":[{"binding":"DB","database_name":"site-creator-d1","database_id":"00000000-0000-4000-8000-000000000000"}],"r2_buckets":[{"binding":"FILES","bucket_name":"site-creator-r2"}]}
